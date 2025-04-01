@@ -22,6 +22,7 @@ const Lang = @import("config/Lang.zig");
 const Save = @import("config/Save.zig");
 const migrator = @import("config/migrator.zig");
 const SharedError = @import("SharedError.zig");
+const Fallout = @import("animations/Fallout.zig");
 
 const Ini = ini.Ini;
 const DisplayServer = enums.DisplayServer;
@@ -364,6 +365,10 @@ pub fn main() !void {
             var color_mix = ColorMix.init(&buffer, config.colormix_col1, config.colormix_col2, config.colormix_col3);
             animation = color_mix.animation();
         },
+        .fallout => {
+            var fallout = try Fallout.init(allocator, &buffer, config.fallout_fg);
+            animation = fallout.animation();
+        }
     }
     defer animation.deinit();
 
