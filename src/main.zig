@@ -368,7 +368,7 @@ pub fn main() !void {
         .fallout => {
             var fallout = try Fallout.init(allocator, &buffer, config.fallout_fg);
             animation = fallout.animation();
-        }
+        },
     }
     defer animation.deinit();
 
@@ -429,7 +429,9 @@ pub fn main() !void {
 
                 if (!animation_timed_out) animation.draw();
 
-                buffer.drawLabel(ly_top_str, 0, 0);
+                if (config.show_version_tag) {
+                    buffer.drawLabel(ly_top_str, 0, 0);
+                }
 
                 if (config.bigclock != .none and buffer.box_height + (bigclock.HEIGHT + 2) * 2 < buffer.height) draw_big_clock: {
                     const format = "%H:%M";
@@ -490,7 +492,10 @@ pub fn main() !void {
                 info_line.label.draw();
 
                 if (!config.hide_key_hints) {
-                    var length: usize = ly_top_str.len + 1;
+                    var length: usize = 0;
+                    if (config.show_version_tag) {
+                        length = ly_top_str.len + 1;
+                    }
 
                     buffer.drawLabel(config.shutdown_key, length, 0);
                     length += config.shutdown_key.len + 1;
