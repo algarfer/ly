@@ -261,3 +261,7 @@ On Arch Linux, the example .xinitrc (/etc/X11/xinit/xinitrc) starts like this:
 ## Additional Information
 The name "Ly" is a tribute to the fairy from the game Rayman.
 Ly was tested by oxodao, who is some seriously awesome dude.
+
+> [!IMPORTANT]
+> If both files `/etc/pam.d/ly` and `/etc/ly/setup.sh`, are encoded with CRLF can prevent ly from working as expected.
+> They should use LF encoding
