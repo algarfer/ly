@@ -134,12 +134,23 @@ pub fn cascade(self: TerminalBuffer) bool {
     return changed;
 }
 
-pub fn drawBoxCenter(self: *TerminalBuffer, show_borders: bool, blank_box: bool) void {
+pub fn drawBoxCenter(self: *TerminalBuffer, show_borders: bool, blank_box: bool, is_centered_x: bool, is_centered_y: bool, x_offset: usize, y_offset: usize) void {
     if (self.width < 2 or self.height < 2) return;
-    const x1 = (self.width - @min(self.width - 2, self.box_width)) / 2;
-    const y1 = (self.height - @min(self.height - 2, self.box_height)) / 2;
-    const x2 = (self.width + @min(self.width, self.box_width)) / 2;
-    const y2 = (self.height + @min(self.height, self.box_height)) / 2;
+
+    var x1: usize = (self.width - @min(self.width - 2, self.box_width)) / 2;
+    var y1: usize = (self.height - @min(self.height - 2, self.box_height)) / 2;
+    var x2: usize = (self.width + @min(self.width, self.box_width)) / 2;
+    var y2: usize = (self.height + @min(self.height, self.box_height)) / 2;
+
+    if (!is_centered_x) {
+        x1 = @divFloor(self.width * x_offset, 100);
+        x2 = x1 + @min(self.width - x1, self.box_width);
+    }
+
+    if (!is_centered_y) {
+        y1 = @divFloor(self.height * y_offset, 100);
+        y2 = y1 + @min(self.height - y1, self.box_height);
+    }
 
     self.box_x = x1;
     self.box_y = y1;

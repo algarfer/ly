@@ -325,7 +325,7 @@ pub fn main() !void {
 
     // Place components on the screen
     {
-        buffer.drawBoxCenter(!config.hide_borders, config.blank_box);
+        buffer.drawBoxCenter(!config.hide_borders, config.blank_box, config.center_box_x, config.center_box_y, config.box_x_offset, config.box_y_offset);
 
         const coordinates = buffer.calculateComponentCoordinates();
         info_line.label.position(coordinates.start_x, coordinates.y, coordinates.full_visible_length, null);
@@ -449,7 +449,7 @@ pub fn main() !void {
                     }
                 }
 
-                buffer.drawBoxCenter(!config.hide_borders, config.blank_box);
+                buffer.drawBoxCenter(!config.hide_borders, config.blank_box, config.center_box_x, config.center_box_y, config.box_x_offset, config.box_y_offset);
 
                 if (resolution_changed) {
                     const coordinates = buffer.calculateComponentCoordinates();

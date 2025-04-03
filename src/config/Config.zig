@@ -68,6 +68,12 @@ x_cmd: []const u8 = build_options.prefix_directory ++ "/bin/X",
 xauth_cmd: []const u8 = build_options.prefix_directory ++ "/bin/xauth",
 xinitrc: ?[]const u8 = "~/.xinitrc",
 xsessions: []const u8 = build_options.prefix_directory ++ "/share/xsessions",
+
+center_box_x: bool = true,
+center_box_y: bool = true,
+box_x_offset: usize = 10,
+box_y_offset: usize = 10,
+
 ////// FALLOUT //////
 fallout_fg: u32 = 0x0000FF00,
 show_version_tag: bool = false,
