@@ -550,7 +550,14 @@ pub fn main() !void {
                 }
 
                 if (config.box_title) |title| {
-                    buffer.drawConfinedLabel(title, buffer.box_x, buffer.box_y - 1, buffer.box_width);
+                    var title_buf = std.ArrayList(u8).init(allocator);
+                    defer title_buf.deinit();
+
+                    try title_buf.appendSlice(" ");
+                    try title_buf.appendSlice(title);
+                    try title_buf.appendSlice(" ");
+
+                    buffer.drawConfinedLabel(title_buf.items, buffer.box_x, buffer.box_y - 1, buffer.box_width);
                 }
 
                 if (config.vi_mode) {
