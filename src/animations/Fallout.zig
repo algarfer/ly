@@ -8,47 +8,6 @@ const Random = std.Random;
 
 pub const FRAME_DELAY: usize = 8;
 
-const VAULT_BOY_IMAGE =
-    \\                                         &&&                          
-    \\                                     &&&&x::+X&&&                     
-    \\                              &&&  &+::;:...::::+$                    
-    \\                             &;+$$x......:;::::::;$&                  
-    \\                             &:...:++;xxx++XX;::;;:;$&                
-    \\                             &$::;X.........:+;..+&;;&&               
-    \\                            &X:x+;;.......;x:....;$;:x&               
-    \\                             &&:............;...:X;::x&               
-    \\                             &+.;&:..+:.:x$+....:x+x;&&               
-    \\       &&&&                 &X:.:;.:X:.....;:...;+Xx$&                
-    \\     &+..:$                 &X....:$;...........;+;X&                 
-    \\     x...;$                 &X.....:+....;.........x&                 
-    \\     X...+&                 &$:x$+:...;xxx$+.......;&                 
-    \\     $;..;$                  &x:x+;:..:;x++:....:;x&&                 
-    \\ &&&$$$X+::+$&               &&+...+xx:........x&&                    
-    \\&$.......+$::$&                &x............;&&&&                    
-    \\ &;;;++;:.xx.:&$X$$&&&&&&&&&$$$$$&x:.......:+x+..+$$&&                
-    \\ &+....::xX..:$x+;;;;++++;;;;;;;+X.:$&Xx+:.+$;..:$xxxxX&&             
-    \\ &+::::...:$:X:;x+;;;;;;;;;;;;;;;$:..:xX$X+:...;$XxxxxxxX$&           
-    \\  $+:::;+X&;.x.+xxx++;;;;;;;;;;;;+X+........:x$Xxxxxxxxxxxx$&         
-    \\  &+.....:$++;;Xxxxxxxxxx++XX;;;;;X+.....X&$Xxxxxxxxxxxxxxxxx$&       
-    \\   &&$Xxxxxx+xxxxxxxxXXX$$&&x;;;;;$:....+XxxxxxxxxxxxxxxxxxxxxX&&     
-    \\         &&$&&&&&&&&&&     &x;;;;+X.....XXxxxxxxxxxxxxxxxxxxxxxx$&    
-    \\                           &x;;;;x+.....&xxxxxxxxX$$XXxxxxxxxxxxx$&   
-    \\                           &x;;;;X+....:&xxxxxxxxXXXX&&&$$xxxxxxXX&   
-    \\                           &X;;;;$:....;$xxxxxxxxXXX$&  &XxxxxxXX$&   
-    \\                           &$;;;;$:....;$xxxxxxxXXXX&& &XxxxxxXXX&    
-    \\                            $+;;;$:....;$xxxxxxxXXX$& &XxxxXXXXX&&    
-    \\                            $xXx+X;....;$xxxxxxXXXX$&&$xxXXXXXX&&     
-    \\                            &+.:;+:....:&xxxxXX$$x+X&&$XXXXXXX&&      
-    \\                            &x.....................x&;X$XXXXX&&       
-    \\                            &X:....................+x..:+x$&&         
-    \\                            &&xXX;..............;x$&X:...++:$&        
-    \\                             &x;;+xX$&$$$$$&$$$$XXXX&;...:$;x&        
-    \\                             &X;;+xxxxxxxxxxxxXXXXXXX&$XXXX$&         
-    \\                             &&;;+xxxxxxxxxxxxXXXXXXX$&&              
-    \\                              &;;+xxxxxxxxxxxxXXXXXXXX&&              
-    \\                                   xxxxxxxxxxxXXXXX                   
-;
-
 const Fallout = @This();
 
 allocator: Allocator,
@@ -59,8 +18,9 @@ fg: u32,
 default_cell: Cell,
 x_offset: usize,
 y_offset: usize,
+image: []u8,
 
-pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32, x_offset: usize, y_offset: usize) !Fallout {
+pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32, x_offset: usize, y_offset: usize, image_path: []const u8) !Fallout {
     return .{
         .allocator = allocator,
         .terminal_buffer = terminal_buffer,
@@ -70,6 +30,7 @@ pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32, x_o
         .default_cell = .{ .ch = ' ', .fg = fg, .bg = terminal_buffer.bg },
         .x_offset = x_offset,
         .y_offset = y_offset,
+        .image = try load_file(allocator, image_path),
     };
 }
 
@@ -91,7 +52,7 @@ fn draw(self: *Fallout) void {
         self.count = 0;
     }
 
-    const image = VAULT_BOY_IMAGE;
+    const image = self.image;
     var image_lines_iter = std.mem.splitSequence(u8, image, "\n");
 
     var lines = std.ArrayList([]const u8).init(self.allocator);
@@ -129,4 +90,20 @@ fn draw(self: *Fallout) void {
 
         y += 1;
     }
+}
+
+fn load_file(allocator: Allocator, path: []const u8) ![]u8 {
+    var file = try std.fs.cwd().openFile(path, .{});
+    defer file.close();
+
+    const file_size = try file.getEndPos();
+    const buffer = try allocator.alloc(u8, file_size);
+
+    const bytes_read = try file.readAll(buffer);
+    if (bytes_read != file_size) {
+        allocator.free(buffer);
+        return error.IncompleteRead;
+    }
+
+    return buffer;
 }

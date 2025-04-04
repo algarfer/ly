@@ -73,6 +73,7 @@ center_box_x: bool = true,
 center_box_y: bool = true,
 box_x_offset: usize = 10,
 box_y_offset: usize = 10,
+image_path: []const u8 = build_options.config_directory ++ "/ly/image.txt",
 show_version_tag: bool = false,
 
 ////// FALLOUT //////

@@ -161,6 +161,7 @@ fn install_ly(allocator: std.mem.Allocator, patch_map: PatchMap, install_config:
         if (install_config) {
             const patched_config = try patchFile(allocator, "res/config.ini", patch_map);
             try installText(patched_config, config_dir, ly_config_directory, "config.ini", .{});
+            try installFile("res/image.txt", config_dir, ly_config_directory, "image.txt", .{});
         }
 
         const patched_setup = try patchFile(allocator, "res/setup.sh", patch_map);

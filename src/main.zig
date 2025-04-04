@@ -366,7 +366,7 @@ pub fn main() !void {
             animation = color_mix.animation();
         },
         .fallout => {
-            var fallout = try Fallout.init(allocator, &buffer, config.fallout_fg, config.fallout_x_offset, config.fallout_y_offset);
+            var fallout = try Fallout.init(allocator, &buffer, config.fallout_fg, config.fallout_x_offset, config.fallout_y_offset, config.image_path);
             animation = fallout.animation();
         },
     }
