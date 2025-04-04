@@ -73,7 +73,9 @@ center_box_x: bool = true,
 center_box_y: bool = true,
 box_x_offset: usize = 10,
 box_y_offset: usize = 10,
+show_version_tag: bool = false,
 
 ////// FALLOUT //////
 fallout_fg: u32 = 0x0000FF00,
-show_version_tag: bool = false,
+fallout_x_offset: usize = 10,
+fallout_y_offset: usize = 10,

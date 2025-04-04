@@ -57,8 +57,10 @@ frame: usize,
 count: usize,
 fg: u32,
 default_cell: Cell,
+x_offset: usize,
+y_offset: usize,
 
-pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32) !Fallout {
+pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32, x_offset: usize, y_offset: usize) !Fallout {
     return .{
         .allocator = allocator,
         .terminal_buffer = terminal_buffer,
@@ -66,6 +68,8 @@ pub fn init(allocator: Allocator, terminal_buffer: *TerminalBuffer, fg: u32) !Fa
         .count = 0,
         .fg = fg,
         .default_cell = .{ .ch = ' ', .fg = fg, .bg = terminal_buffer.bg },
+        .x_offset = x_offset,
+        .y_offset = y_offset,
     };
 }
 
@@ -90,17 +94,28 @@ fn draw(self: *Fallout) void {
     const image = VAULT_BOY_IMAGE;
     var image_lines_iter = std.mem.splitSequence(u8, image, "\n");
 
-    const center_x = @divFloor(buf_width, 2);
-    var y: usize = @divFloor(buf_height, 4);
+    var lines = std.ArrayList([]const u8).init(self.allocator);
+    defer lines.deinit();
 
     while (image_lines_iter.next()) |line| {
-        if (y >= buf_height) break;
+        lines.append(line) catch continue;
+    }
 
-        const line_length = line.len;
-        const start_x = if (line_length < buf_width)
-            center_x - @divFloor(line_length, 2)
-        else
-            0;
+    var max_line_length: usize = 0;
+    for (lines.items) |line| {
+        if (line.len > max_line_length) {
+            max_line_length = line.len;
+        }
+    }
+
+    const right_margin = @divFloor(buf_width * self.x_offset, 100);
+    const start_x = buf_width - max_line_length - right_margin;
+
+    const vertical_offset = @divFloor(buf_height * self.y_offset, 100);
+    var y: usize = vertical_offset;
+
+    for (lines.items) |line| {
+        if (y >= buf_height) break;
 
         for (line, 0..) |char, i| {
             if (start_x + i >= buf_width) break;
