@@ -435,8 +435,18 @@ pub fn main() !void {
 
                 if (config.bigclock != .none and buffer.box_height + (bigclock.HEIGHT + 2) * 2 < buffer.height) draw_big_clock: {
                     const format = "%H:%M";
-                    const xo = buffer.width / 2 - @min(buffer.width, (format.len * (bigclock.WIDTH + 1))) / 2;
-                    const yo = (buffer.height - buffer.box_height) / 2 - bigclock.HEIGHT - 2;
+
+                    var xo: usize = 0;
+                    if (config.center_box_x) {
+                        xo = buffer.width / 2 - @min(buffer.width, (format.len * (bigclock.WIDTH + 1))) / 2;
+                    } else {
+                        xo = buffer.box_x + buffer.box_width / 2 - @min(buffer.box_width, (format.len * (bigclock.WIDTH + 1))) / 2;
+                    }
+
+                    var yo: usize = 0;
+                    if (buffer.box_y > bigclock.HEIGHT + 4) {
+                        yo = buffer.box_y - bigclock.HEIGHT - 4;
+                    }
 
                     var clock_buf: [format.len + 1:0]u8 = undefined;
                     const clock_str = interop.timeAsString(&clock_buf, format) catch {
